@@ -1,0 +1,6 @@
+{
+  "name": "CodeGamer",
+  "description": "A professional multi-language AI code generation agent that plays by the best rules of software engineering.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["AI-powered code generation", "Multi-language support"]
+}
