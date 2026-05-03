@@ -1,20 +1,45 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# CodeGamer 🚀
 
-# Run and deploy your AI Studio app
+**Author: Muhammad Mutahhar Khan**
 
-This contains everything you need to run your app locally.
+CodeGamer is an intelligent AI-powered code generation agent designed to make programming faster and more engaging. With a clean and attractive interface, it allows users to generate high-quality code in multiple programming languages based on simple task descriptions.
 
-View your app in AI Studio: https://ai.studio/apps/f5781955-1348-4983-b994-5cb3e4bf8e5d
+## 🌟 Features
 
-## Run Locally
+* 🎯 **Multi-Language Support**
+  Choose from 7 popular programming languages:
 
-**Prerequisites:**  Node.js
+  * Python
+  * JavaScript
+  * Java
+  * C++
+  * C#
+  * Go
+  * Ruby
 
+* 🧠 **Smart Code Generation**
+  Understands user prompts and generates accurate, task-specific code.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+* 📘 **Code Explanation**
+  Provides clear explanations of the generated code to help users learn and understand.
+
+* 🎨 **Attractive UI/UX**
+  Engaging and easy-to-use interface for a smooth user experience.
+
+## ⚙️ How It Works
+
+1. Select your desired programming language.
+2. Enter the task or problem description.
+3. The AI processes your request.
+4. Get clean, structured code along with a detailed explanation.
+
+## 🚀 Use Cases
+
+* Learning programming concepts
+* Solving coding problems
+* Understanding complex logic
+
+---
+
+## ⚠️ Note:
+This project is the result of significant effort and dedication. Please do not copy or redistribute it as your own. You are welcome to use and learn from it, but always respect the rights of the original creator.
