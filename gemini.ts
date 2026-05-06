@@ -1,8 +1,15 @@
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// Use import.meta.env for client-side accessibility on Netlify/Vercel/etc.
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+const ai = new GoogleGenAI({ apiKey });
 
 export async function generateCode(prompt: string, language: string) {
+  if (!apiKey) {
+    throw new Error("VITE_GEMINI_API_KEY is not defined. Please add it to your environment variables.");
+  }
+
   const systemInstruction = `You are CodeGamer, a professional multi-language Code Generation AI Agent. 
 Your goal is to convert user instructions into correct, clean, and executable code in the requested programming language: ${language}.
 
@@ -19,7 +26,7 @@ Principles:
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3.1-pro-preview",
+      model: "gemini-1.5-pro",
       contents: prompt,
       config: {
         systemInstruction,

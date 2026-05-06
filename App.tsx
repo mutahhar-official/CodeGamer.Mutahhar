@@ -7,7 +7,6 @@ import {
   Check, 
   Send, 
   RotateCcw, 
-  ChevronRight,
   Cpu,
   Globe,
   Loader2
@@ -15,7 +14,7 @@ import {
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
-import { generateCode } from './services/gemini';
+import { generateCode } from './gemini';
 
 const SUPPORTED_LANGUAGES = [
   { id: 'python', name: 'Python', icon: '🐍' },
@@ -95,36 +94,36 @@ export default function App() {
           </div>
         </header>
 
-        <main className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+        <main className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Controls Sidebar (Requirement Input) */}
-          <section className="md:col-span-4 flex flex-col gap-6 sticky top-6">
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl flex flex-col min-h-[500px]">
+          <section className="lg:col-span-4 flex flex-col gap-6 lg:sticky lg:top-6 mb-4 lg:mb-0">
+            <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 md:p-5 shadow-xl flex flex-col lg:min-h-[600px]">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
-                  <Terminal className="w-4 h-4" /> Requirement Input
+                  <Terminal className="w-4 h-4 text-indigo-400" /> Requirement Input
                 </h2>
-                <span className="text-[10px] font-mono text-slate-600 uppercase">
-                  {prompt.length} Characters
+                <span className="text-[10px] font-mono text-slate-600 uppercase bg-slate-950 px-2 py-1 rounded">
+                  {prompt.length} Chars
                 </span>
               </div>
 
               <div className="mb-6">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-2 block">
-                  Select Language
+                  Select Destination Language
                 </label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-2 gap-2">
                   {SUPPORTED_LANGUAGES.map((lang) => (
                     <button
                       key={lang.id}
                       onClick={() => setSelectedLanguage(lang)}
-                      className={`flex items-center justify-between px-3 py-2.5 rounded-lg border text-xs font-medium transition-all duration-200 ${
+                      className={`flex items-center justify-between px-3 py-2.5 rounded-lg border text-xs font-medium transition-all duration-200 min-h-[44px] ${
                         selectedLanguage.id === lang.id
-                          ? 'bg-indigo-600/10 border-indigo-500/50 text-white'
+                          ? 'bg-indigo-600 text-white border-indigo-500 shadow-lg shadow-indigo-900/40'
                           : 'bg-slate-950/50 border-slate-800 text-slate-500 hover:border-slate-700'
                       }`}
                     >
                       <span>{lang.name}</span>
-                      <span className="opacity-50 group-hover:opacity-100">{lang.icon}</span>
+                      <span className="text-base">{lang.icon}</span>
                     </button>
                   ))}
                 </div>
@@ -135,76 +134,74 @@ export default function App() {
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   placeholder="Describe your logic requirements here..."
-                  className="flex-1 bg-slate-950 border border-slate-800 rounded-lg p-4 font-mono text-sm text-slate-300 leading-relaxed focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all resize-none placeholder:text-slate-700"
+                  className="w-full min-h-[200px] lg:flex-1 bg-slate-950 border border-slate-800 rounded-lg p-4 font-mono text-sm text-slate-300 leading-relaxed focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all resize-none placeholder:text-slate-700"
                 />
                 
                 <div className="flex gap-2">
                   <button
                     onClick={handleGenerate}
                     disabled={isLoading || !prompt.trim()}
-                    className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-lg text-sm shadow-lg shadow-indigo-900/20 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-4 md:py-3 rounded-lg text-sm shadow-lg shadow-indigo-900/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {isLoading ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-white" />
+                      <Loader2 className="w-5 h-5 animate-spin text-white" />
                     ) : (
-                      <>GENERATE CLEAN CODE <Send className="w-3 h-3" /></>
+                      <>GENERATE CODE <Send className="w-4 h-4" /></>
                     )}
                   </button>
                   <button
                     onClick={handleReset}
-                    className="p-3 bg-slate-800 border border-slate-700 rounded-lg hover:bg-slate-700 transition-colors text-slate-300"
+                    className="p-4 md:p-3 bg-slate-800 border border-slate-700 rounded-lg hover:bg-slate-700 transition-colors text-slate-300 active:scale-95"
                     title="Clear All"
                   >
-                    <RotateCcw className="w-4 h-4" />
+                    <RotateCcw className="w-5 h-5 md:w-4 md:h-4" />
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Verification Status Card */}
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
-              <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-3">Self-Verification Loop</h3>
+            {/* Verification Status Card - Hidden on very small mobile if desired, but good for feedback */}
+            <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg">
+              <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
+                <Check className="w-3 h-3 text-emerald-500" /> System Integrity Check
+              </h3>
               <ul className="text-[11px] space-y-2 font-mono">
-                <li className={`flex items-center gap-2 ${prompt.length > 5 ? 'text-emerald-400' : 'text-slate-600'}`}>
-                  <Check className="w-3 h-3" />
+                <li className={`flex items-center gap-3 ${prompt.length > 5 ? 'text-emerald-400' : 'text-slate-600'}`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${prompt.length > 5 ? 'bg-emerald-400' : 'bg-slate-700'}`} />
                   Requirement Analyzed
                 </li>
-                <li className={`flex items-center gap-2 ${output ? 'text-emerald-400' : 'text-slate-600'}`}>
-                  <Check className="w-3 h-3" />
-                  Syntax Validation Passed
+                <li className={`flex items-center gap-3 ${output ? 'text-emerald-400' : 'text-slate-600'}`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${output ? 'bg-emerald-400' : 'bg-slate-700'}`} />
+                  Code Synthesized
                 </li>
-                <li className="flex items-center gap-2 text-slate-400">
-                  <div className={`w-3 h-3 rounded-full border border-slate-600 flex items-center justify-center ${isLoading ? 'animate-spin' : ''}`}>
-                    <div className="w-1 h-1 bg-slate-400 rounded-full" />
-                  </div>
-                  {isLoading ? 'Executing Final Logical Check...' : 'Ready for generation'}
+                <li className="flex items-center gap-3 text-slate-400">
+                  <div className={`w-1.5 h-1.5 rounded-full ${isLoading ? 'bg-indigo-500 animate-pulse' : 'bg-slate-700'}`} />
+                  {isLoading ? 'Logical Validation...' : 'Engine Standing By'}
                 </li>
               </ul>
             </div>
           </section>
 
           {/* Output Display Section */}
-          <section className="md:col-span-8 flex flex-col min-h-[700px]">
+          <section className="lg:col-span-8 flex flex-col min-h-[500px] lg:min-h-[700px]">
             <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden flex flex-col shadow-2xl relative flex-1">
-              <div className="bg-slate-800/40 px-5 py-3 border-b border-slate-800 flex items-center justify-between">
+              <div className="bg-slate-800/40 px-4 py-3 border-b border-slate-800 flex items-center justify-between sticky top-0 z-20 backdrop-blur-md">
                 <div className="flex gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-700" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-700" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-700" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/50" />
                 </div>
-                <div className="text-[11px] font-mono text-slate-500 tracking-wider">
-                  {selectedLanguage.id}.out
+                <div className="text-[10px] font-mono text-slate-500 tracking-wider font-bold">
+                  {selectedLanguage.id.toUpperCase()}.OUT
                 </div>
-                <div className="flex gap-4 items-center">
-                  <button 
-                    onClick={() => handleCopy(output)}
-                    disabled={!output}
-                    className="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1.5 disabled:opacity-30 transition-colors"
-                  >
-                    {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                    {copied ? 'Copied' : 'Copy'}
-                  </button>
-                </div>
+                <button 
+                  onClick={() => handleCopy(output)}
+                  disabled={!output}
+                  className="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1.5 disabled:opacity-30 transition-colors bg-slate-950/40 px-3 py-1 rounded border border-slate-700/50"
+                >
+                  {copied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                  <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
+                </button>
               </div>
               
               <div className="flex-1 overflow-auto custom-scrollbar">
@@ -218,10 +215,10 @@ export default function App() {
                       className="p-8 prose prose-invert prose-indigo max-w-none prose-pre:bg-slate-950 prose-pre:border prose-pre:border-slate-800 prose-code:text-indigo-400"
                     >
                       <ReactMarkdown 
-                        remarkPlugins={[remarkGfm]} 
-                        rehypePlugins={[rehypeHighlight]}
-                      >
-                        {output}
+                          remarkPlugins={[remarkGfm]} 
+                          rehypePlugins={[rehypeHighlight]}
+                        >
+                          {output}
                       </ReactMarkdown>
                     </motion.div>
                   ) : (
@@ -273,8 +270,8 @@ export default function App() {
         <footer className="mt-8 pt-6 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center text-[10px] font-mono text-slate-600 gap-4 mb-4">
           <div className="flex gap-8">
             <span className="flex gap-2">MEM_STATE: <span className="text-emerald-500 font-bold tracking-widest">NULL/STATELESS</span></span>
-            <span className="flex gap-2">RUNTIME: <span className="text-white">v1.0.42</span></span>
-            <span className="flex gap-2 uppercase">Core: <span className="text-indigo-400">Gemini-3.1-Pro</span></span>
+            <span className="flex gap-2">RUNTIME: <span className="text-white">v1.1.0</span></span>
+            <span className="flex gap-2 uppercase">Core: <span className="text-indigo-400">Gemini-1.5-Pro</span></span>
           </div>
           <div className="flex items-center gap-3 bg-slate-900/50 px-3 py-1.5 rounded border border-slate-800/50">
             <span className="animate-pulse w-2 h-2 rounded-full bg-emerald-500"></span>
