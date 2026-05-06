@@ -34,6 +34,22 @@ export default function App() {
   const [copied, setCopied] = useState(false);
   const outputRef = useRef<HTMLDivElement>(null);
 
+  // Check if API key exists (Environment or LocalStorage)
+  const isKeyValid = (key: string | undefined | null) => {
+    if (!key) return false;
+    const cleaned = key.trim();
+    return cleaned !== '' && cleaned !== 'undefined' && cleaned !== 'null';
+  };
+
+  const [sessionKey, setSessionKey] = useState(localStorage.getItem('gemini_session_key') || '');
+  const hasApiKey = isKeyValid(import.meta.env.VITE_GEMINI_API_KEY) || isKeyValid(sessionKey);
+
+  const handleSaveKey = (key: string) => {
+    const trimmed = key.trim();
+    setSessionKey(trimmed);
+    localStorage.setItem('gemini_session_key', trimmed);
+  };
+
   const handleGenerate = async () => {
     if (!prompt.trim() || isLoading) return;
 
@@ -81,18 +97,77 @@ export default function App() {
           </div>
           
           <div className="hidden md:flex items-center gap-4">
+            {!hasApiKey && (
+              <div className="flex items-center gap-2 bg-red-900/20 border border-red-500/50 px-3 py-1.5 rounded-md text-xs text-red-400 group relative cursor-help">
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                <span>API Key Missing</span>
+                <div className="absolute top-full right-0 mt-2 w-64 p-3 bg-slate-900 border border-slate-800 rounded-lg shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none text-[10px] leading-relaxed">
+                  Get your key from <span className="text-white">aistudio.google.com</span> and add it as <code className="text-indigo-400">VITE_GEMINI_API_KEY</code> in Netlify.
+                </div>
+              </div>
+            )}
             <div className="flex items-center gap-2 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-md text-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+              <span className={`w-2 h-2 rounded-full ${hasApiKey ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-600'}`}></span>
               <span className="text-slate-400">System:</span>
-              <span className="text-white font-mono">Ready</span>
-            </div>
-            <div className="flex items-center gap-2 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-md text-xs">
-              <Globe className="w-3 h-3 text-slate-500" />
-              <span className="text-slate-400">Session:</span>
-              <span className="text-white font-mono uppercase">Independent</span>
+              <span className="text-white font-mono">{hasApiKey ? 'Ready' : 'Standby'}</span>
             </div>
           </div>
         </header>
+
+        {!hasApiKey && (
+          <div className="mb-6 p-6 bg-indigo-600/10 border border-indigo-500/30 rounded-xl flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-600/20">
+                <Globe className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-white text-base font-semibold">Connect Gemini API</h3>
+                <p className="text-xs text-slate-400 mt-1 max-w-md">
+                  Paste your API key below to start generating code. Your key is stored locally in your browser and never shared.
+                </p>
+              </div>
+            </div>
+            
+            <div className="w-full md:w-auto flex flex-col sm:flex-row gap-2">
+              <input 
+                type="password"
+                placeholder="Paste API Key here..."
+                className="bg-slate-950 border border-slate-800 rounded-lg px-4 py-2 text-sm focus:ring-1 focus:ring-indigo-500 outline-none w-full md:w-64"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSaveKey(e.currentTarget.value);
+                }}
+                id="api-key-input"
+              />
+              <button 
+                onClick={() => {
+                  const input = document.getElementById('api-key-input') as HTMLInputElement;
+                  handleSaveKey(input.value);
+                }}
+                className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg font-bold text-sm transition-all whitespace-nowrap active:scale-95"
+              >
+                Connect Engine
+              </button>
+            </div>
+          </div>
+        )}
+
+        {hasApiKey && !isKeyValid(import.meta.env.VITE_GEMINI_API_KEY) && (
+          <div className="mb-6 px-4 py-2 bg-slate-900 border border-slate-800 rounded-lg flex items-center justify-between">
+            <div className="flex items-center gap-2 text-[11px]">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span className="text-slate-500">Session Active: Using Locally Provided Key</span>
+            </div>
+            <button 
+              onClick={() => {
+                localStorage.removeItem('gemini_session_key');
+                setSessionKey('');
+              }}
+              className="text-[10px] text-slate-400 hover:text-red-400 underline"
+            >
+              Disconnect Key
+            </button>
+          </div>
+        )}
 
         <main className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Controls Sidebar (Requirement Input) */}
