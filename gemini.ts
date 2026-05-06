@@ -1,13 +1,17 @@
 import { GoogleGenAI } from "@google/genai";
 
 // Use import.meta.env for client-side accessibility on Netlify/Vercel/etc.
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-
-const ai = new GoogleGenAI({ apiKey });
+const getApiKey = () => import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : '');
+let genAI: GoogleGenAI | null = null;
 
 export async function generateCode(prompt: string, language: string) {
+  const apiKey = getApiKey();
   if (!apiKey) {
-    throw new Error("VITE_GEMINI_API_KEY is not defined. Please add it to your environment variables.");
+    throw new Error("VITE_GEMINI_API_KEY is not defined. Please add it to your environment variables on your deployment platform (e.g., Netlify).");
+  }
+
+  if (!genAI) {
+    genAI = new GoogleGenAI(apiKey);
   }
 
   const systemInstruction = `You are CodeGamer, a professional multi-language Code Generation AI Agent. 
@@ -25,16 +29,17 @@ Principles:
 - Choose the most efficient/practical approach.`;
 
   try {
-    const response = await ai.models.generateContent({
+    const model = genAI.getGenerativeModel({ 
       model: "gemini-1.5-pro",
-      contents: prompt,
-      config: {
-        systemInstruction,
-        temperature: 0.7,
-      },
+      systemInstruction: {
+        role: "system",
+        parts: [{ text: systemInstruction }]
+      }
     });
-
-    return response.text;
+    
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
   } catch (error) {
     console.error("Gemini API Error:", error);
     throw new Error("Failed to generate code. Please check your connection or API key.");
