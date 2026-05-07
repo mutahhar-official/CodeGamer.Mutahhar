@@ -42,7 +42,7 @@ export default function App() {
   };
 
   const [sessionKey, setSessionKey] = useState(localStorage.getItem('gemini_session_key') || '');
-  const hasApiKey = isKeyValid(import.meta.env.VITE_GEMINI_API_KEY) || isKeyValid(sessionKey);
+  const hasApiKey = isKeyValid(process.env.GEMINI_API_KEY) || isKeyValid(import.meta.env.VITE_GEMINI_API_KEY) || isKeyValid(sessionKey);
 
   const handleSaveKey = (key: string) => {
     const trimmed = key.trim();

@@ -4,12 +4,13 @@ import { GoogleGenAI } from "@google/genai";
 const getApiKey = () => {
   let key = '';
   try {
-    key = import.meta.env.VITE_GEMINI_API_KEY || localStorage.getItem('gemini_session_key') || '';
+    // Use process.env.GEMINI_API_KEY as per SKILL.md for AI Studio environment
+    // Fallback to import.meta.env or localStorage for user-provided keys
+    key = process.env.GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY || localStorage.getItem('gemini_session_key') || '';
   } catch (e) {
     key = import.meta.env.VITE_GEMINI_API_KEY || '';
   }
   
-  // Clean up potential "placeholder strings" that CI/CD or users might inject
   const cleaned = key.trim();
   if (cleaned === 'undefined' || cleaned === 'null' || !cleaned) {
     return '';
@@ -47,9 +48,9 @@ Principles:
 - Stateless operation: assume no prior context.
 - Choose the most efficient/practical approach.`;
 
-    const response = await genAI.models.generateContent({ 
-      model: "gemini-1.5-pro",
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    const response = await genAI!.models.generateContent({ 
+      model: "gemini-3.1-pro-preview",
+      contents: prompt,
       config: {
         systemInstruction,
         temperature: 0.7,
