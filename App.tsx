@@ -56,7 +56,8 @@ export default function App() {
     setIsLoading(true);
     setOutput('');
     try {
-      const result = await generateCode(prompt, selectedLanguage.name);
+      const activeKey = import.meta.env.VITE_GEMINI_API_KEY || sessionKey;
+      const result = await generateCode(prompt, selectedLanguage.name, activeKey);
       setOutput(result || 'No response generated.');
     } catch (error) {
       setOutput(`Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}`);

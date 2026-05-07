@@ -19,10 +19,10 @@ const getApiKey = () => {
 let genAI: GoogleGenAI | null = null;
 let currentKey: string | null = null;
 
-export async function generateCode(prompt: string, language: string) {
-  const apiKey = getApiKey();
+export async function generateCode(prompt: string, language: string, overrideKey?: string) {
+  const apiKey = (overrideKey || getApiKey()).trim();
   if (!apiKey) {
-    throw new Error("API Key is missing. Please provide a valid Gemini API key.");
+    throw new Error("API Key is missing. Please provide a Gemini API key in the connection panel above.");
   }
 
   try {
@@ -48,8 +48,8 @@ Principles:
 - Choose the most efficient/practical approach.`;
 
     const response = await genAI.models.generateContent({ 
-      model: "gemini-3.1-pro-preview",
-      contents: prompt,
+      model: "gemini-1.5-pro",
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
       config: {
         systemInstruction,
         temperature: 0.7,
